@@ -10,6 +10,10 @@ on:
           - minor
           - major
 
+permissions:
+  contents: write
+  pull-requests: write
+
 name: Create release branch
 
 jobs:
@@ -23,4 +27,4 @@ jobs:
         uses: ./.github/actions/create-release
         with:
           upgrade-type: ${{ github.event.inputs.upgrade-type }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ github.token }}
