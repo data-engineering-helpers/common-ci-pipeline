@@ -23,4 +23,4 @@ jobs:
         uses: ./.github/actions/create-release
         with:
           upgrade-type: ${{ github.event.inputs.upgrade-type }}
-          repo-token: ${{ github.token }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
