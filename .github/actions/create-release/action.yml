@@ -1,0 +1,116 @@
+name: Create release
+description: Create the release branch and the associated PR
+
+inputs:
+  upgrade-type:
+    description: Type of upgrade to do. One of 'patch', 'minor', 'major'.
+    required: true
+  repo-token:
+    description: The GitHub token used to create release
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  version:
+    description: The version of the created release branch.
+    value: ${{ steps.step-output-id.outputs.version }}
+
+runs:
+  using: composite
+
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Get current version
+      id: get_current_version
+      run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Get version to upgrade to
+      id: upgrade-version-id
+      uses: data-engineering-helpers/common-ci-pipeline/.github/actions/upgrade-version@0.1.2
+      with:
+        version: ${{ steps.get_current_version.outputs.version }}
+        upgrade-type: ${{ inputs.upgrade-type }}
+
+    - name: Add log
+      shell: bash
+      run: echo "Detected version to upgrade to ${{ steps.upgrade-version-id.outputs.version }}"
+
+    - name: Get open PRs labels
+      id: pr_labels
+      run: |
+        PR_LABELS=$(curl -s -H "Authorization: Bearer ${{ inputs.repo-token }}" \
+        "https://api.github.com/repos/${{ github.repository }}/pulls?q=is%3Apr+is%3Aopen" | jq -r '.[].labels[].name' | paste -sd ',')
+        echo "pr_labels=$PR_LABELS" >> $GITHUB_OUTPUT
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.repo-token }}
+
+    - name: Check if 'release' labels exist on PRs
+      id: check_labels
+      run: |
+        PR_LABELS="${{ steps.pr_labels.outputs.pr_labels }}"
+
+        if [[ "$PR_LABELS" == *"release"* ]]; then
+          echo "There are open PRs with 'release' labels"
+          exit 1
+        else
+          echo "No open PRs with 'release' labels"
+          exit 0
+        fi
+      shell: bash
+
+    - name: Gitflow Workflow Action
+      uses: hoangvvo/gitflow-workflow-action@0.1.0
+      with:
+        develop_branch: "develop"
+        main_branch: "main"
+        version: ${{ steps.upgrade-version-id.outputs.version }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.repo-token }}
+
+    - name: Get release PR number
+      id: pr_number
+      run: |
+        PR_NUMBER=$(curl -s -H "Authorization: Bearer ${{ inputs.repo-token }}" \
+        "https://api.github.com/repos/${{ github.repository }}/pulls?q=is%3Apr+is%3Aopen" | jq -r '.[] | select(.title | startswith("Release")) | {number} | join("")')
+        echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.repo-token }}
+
+    - name: Set release label to PR
+      uses: actions-ecosystem/action-add-labels@v1
+      with:
+        number: ${{ steps.pr_number.outputs.pr_number }}
+        labels: release
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        ref: "release/${{ steps.upgrade-version-id.outputs.version }}"
+      env:
+        GITHUB_TOKEN: ${{ inputs.repo-token }}
+
+    - name: Upgrade version
+      run: make upgrade version=${{ steps.upgrade-version-id.outputs.version }} || true
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.repo-token }}
+
+    - name: Commit changes and push to repository
+      uses: EndBug/add-and-commit@v9.1.4
+      with:
+        default_author: github_actions
+        message: "Upgrade version to ${{ steps.upgrade-version-id.outputs.version }}"
+      env:
+        GITHUB_TOKEN: ${{ inputs.repo-token }}
+
+    - name: Outputs the new version
+      id: step-output-id
+      run: |
+        echo "New release with version ${{ steps.upgrade-version-id.outputs.version }}"
+        echo "version=${{ steps.upgrade-version-id.outputs.version }}" >> $GITHUB_OUTPUT
+      shell: bash

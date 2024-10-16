@@ -1,0 +1,36 @@
+name: Finish release
+description: Create a tag and merge into develop.
+inputs:
+  repo-token:
+    description: "The GitHub token used to create release"
+    required: false
+    default: ${{ github.token }}
+runs:
+  using: composite
+  steps:
+    - name: Gitflow Workflow Action
+      uses: hoangvvo/gitflow-workflow-action@0.1.0
+      with:
+        develop_branch: "develop"
+        main_branch: "main"
+      env:
+        GITHUB_TOKEN: ${{ inputs.repo-token }}
+    - name: Delete release or hotfix branch if merged into develop
+      env:
+        GITHUB_TOKEN: ${{ inputs.repo-token }}
+      shell: bash
+      run: |
+        TARGET_BRANCH=${{ github.event.pull_request.base.ref }}
+        SOURCE_BRANCH=${{ github.event.pull_request.head.ref }}
+        PR_MERGED=${{ github.event.pull_request.merged }}
+
+        echo "Target branch: $TARGET_BRANCH"
+        echo "Source branch: $SOURCE_BRANCH"
+        echo "PR merged: $PR_MERGED"
+
+        if [[ "$PR_MERGED" == "true" ]] && [[ "$TARGET_BRANCH" == "develop" ]] && [[ "$SOURCE_BRANCH" =~ ^(release/|hotfix/) ]]; then
+          echo "Deleting branch $SOURCE_BRANCH"
+          git push origin --delete $SOURCE_BRANCH
+        else
+          echo "Conditions not met, not deleting the branch."
+        fi

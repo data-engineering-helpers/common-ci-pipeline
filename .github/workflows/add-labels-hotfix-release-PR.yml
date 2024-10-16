@@ -1,0 +1,24 @@
+name: Add Label Hotfix - Releases
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  add_label:
+    runs-on: ${{ vars.RUNNER_NAME }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: add Release Label
+        if: ${{ startsWith(github.event.pull_request.title, 'Release') }}
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          labels: release
+
+      - name: add Hotfix Label
+        if: ${{ startsWith(github.event.pull_request.title, 'Hotfix') }}
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          labels: hotfix

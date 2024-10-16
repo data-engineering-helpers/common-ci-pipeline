@@ -1,0 +1,87 @@
+name: Upgrade version
+description: Upgrades the given version as [MAJOR.MINOR.PATCH.devX] and exports it into an environment variable
+
+inputs:
+  version:
+    description: The current version to be upgraded.
+    default: ""
+    required: true
+  upgrade-type:
+    description: Choice of the type of upgrade of the next version.
+    default: ""
+    required: true
+  suffix-snapshot-version:
+    description: Suffix [0-9] for SNAPSHOT generation version
+    default: ""
+    required: false
+
+outputs:
+  version:
+    description: The version upgraded with the type of upgrade to apply.
+    value: ${{ steps.step-output-id.outputs.version }}
+
+runs:
+  using: composite
+
+  steps:
+    - name: Check inputs
+      shell: bash
+      run: |
+        if [[ "${{ inputs.version }}" == "" ]]; then
+          echo "Input 'version' must be provided."
+          exit 1
+        fi
+
+        value="${{ inputs.upgrade-type }}"
+        if [[ "$value" != "major" && "$value" != "minor" && "$value" != "patch" ]]; then
+          echo "Error: invalid value for upgrade-type : '$value'. It must be one of 'major', 'minor', or 'patch'."
+          exit 1
+        fi
+        if [[ -n "${{ inputs.suffix-snapshot-version }}" && ! "${{ inputs.suffix-snapshot-version }}" =~ ^-?[0-9]+$ ]]; then
+          echo "Error: the value for suffix-snapshot-version must be an integer."
+          exit 1
+        fi
+
+    - name: Generate MAJOR Version
+      if: ${{ inputs.upgrade-type == 'major' }}
+      shell: bash
+      run: |
+        VERSION=${{ inputs.version }}
+        VERSION_MAJOR=$(echo "$VERSION" | cut -d. -f1)
+        NEW_MAJOR_VERSION=$((VERSION_MAJOR + 1))
+        echo NEW_VERSION="$NEW_MAJOR_VERSION.0.0" >> $GITHUB_ENV
+
+    - name: Generate MINOR Version
+      if: ${{ inputs.upgrade-type == 'minor' }}
+      shell: bash
+      run: |
+        VERSION=${{ inputs.version }}
+        VERSION_MAJOR=$(echo "$VERSION" | cut -d. -f1)
+        VERSION_MINOR=$(echo "$VERSION" | cut -d. -f2)
+        NEW_MINOR_VERSION=$((VERSION_MINOR + 1))
+        echo NEW_VERSION="$VERSION_MAJOR.$NEW_MINOR_VERSION.0" >> $GITHUB_ENV
+
+    - name: Generate PATCH Version
+      if: ${{ inputs.upgrade-type == 'patch' }}
+      shell: bash
+      run: |
+        VERSION=${{ inputs.version }}
+        VERSION_MAJOR=$(echo "$VERSION" | cut -d. -f1)
+        VERSION_MINOR=$(echo "$VERSION" | cut -d. -f2)
+        VERSION_PATCH=$(echo "$VERSION" | cut -d. -f3)
+        NEW_PATCH_VERSION=$((VERSION_PATCH + 1))
+        echo NEW_VERSION="$VERSION_MAJOR.$VERSION_MINOR.$NEW_PATCH_VERSION" >> $GITHUB_ENV
+
+    - name: Generate SNAPSHOT Version
+      if: ${{ inputs.suffix-snapshot-version != '' }}
+      shell: bash
+      run: |
+        VERSION=${{ env.NEW_VERSION }}
+        echo NEW_VERSION="$VERSION.dev${{ inputs.suffix-snapshot-version }}" >> $GITHUB_ENV
+
+    - name: Logs and outputs the result
+      id: step-output-id
+      shell: bash
+      run: |
+        echo "New version detected is ${{ env.NEW_VERSION }}"
+        echo "version=${{ env.NEW_VERSION }}" >> $GITHUB_OUTPUT

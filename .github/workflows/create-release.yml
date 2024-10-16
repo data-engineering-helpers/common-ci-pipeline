@@ -1,0 +1,26 @@
+on:
+  workflow_dispatch:
+    inputs:
+      upgrade-type:
+        type: choice
+        required: true
+        description: "Type of upgrade to apply for release"
+        options:
+          - patch
+          - minor
+          - major
+
+name: Create release branch
+
+jobs:
+  pre_release:
+    runs-on: ${{ vars.RUNNER_NAME }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: Create release
+        uses: ./.github/actions/create-release
+        with:
+          upgrade-type: ${{ github.event.inputs.upgrade-type }}
+          repo-token: ${{ github.token }}

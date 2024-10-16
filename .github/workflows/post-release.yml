@@ -1,0 +1,16 @@
+on:
+  pull_request:
+    types:
+      - closed
+
+name: Finish release
+
+jobs:
+  release_workflow:
+    runs-on: ${{ vars.RUNNER_NAME }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: Finish release
+        uses: ./.github/actions/post-release
