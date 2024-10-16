@@ -9,7 +9,7 @@ isset-%: ## Test if variable % is set or exit with error
 	# @: $(if $(value $*),,$(error Variable $* is not set))
 
 upgrade: isset-version ## Upgrades the repo version
-	@echo -n $(version) > VERSION;
+	@echo $(version) > VERSION;
 	@make upgrade-github-actions version=$(version)
 
 upgrade-github-actions: isset-version
