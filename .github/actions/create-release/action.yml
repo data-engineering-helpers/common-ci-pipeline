@@ -29,7 +29,7 @@ runs:
 
     - name: Get version to upgrade to
       id: upgrade-version-id
-      uses: data-engineering-helpers/common-ci-pipeline/.github/actions/upgrade-version@0.1.1
+      uses: data-engineering-helpers/common-ci-pipeline/.github/actions/upgrade-version@0.1.0
       with:
         version: ${{ steps.get_current_version.outputs.version }}
         upgrade-type: ${{ inputs.upgrade-type }}
