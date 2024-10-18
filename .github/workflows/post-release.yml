@@ -3,6 +3,10 @@ on:
     types:
       - closed
 
+permissions:
+  contents: write
+  pull-requests: write
+
 name: Finish release
 
 jobs:
