@@ -21,6 +21,8 @@ runs:
   steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        token: ${{ inputs.repo-token }}
 
     - name: Get current version
       id: get_current_version
