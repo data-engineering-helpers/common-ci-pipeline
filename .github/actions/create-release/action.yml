@@ -91,6 +91,7 @@ runs:
       uses: actions/checkout@v4
       with:
         ref: "release/${{ steps.upgrade-version-id.outputs.version }}"
+        token: ${{ inputs.repo-token }}
       env:
         GITHUB_TOKEN: ${{ inputs.repo-token }}
 
