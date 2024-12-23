@@ -29,7 +29,7 @@ runs:
 
     - name: Get version to upgrade to
       id: upgrade-version-id
-      uses: data-engineering-helpers/common-ci-pipeline/.github/actions/upgrade-version@0.1.1
+      uses: data-engineering-helpers/common-ci-pipeline/.github/actions/upgrade-version@0.1.2
       with:
         version: ${{ steps.get_current_version.outputs.version }}
         upgrade-type: ${{ inputs.upgrade-type }}
@@ -91,6 +91,7 @@ runs:
       uses: actions/checkout@v4
       with:
         ref: "release/${{ steps.upgrade-version-id.outputs.version }}"
+        token: ${{ inputs.repo-token }}
       env:
         GITHUB_TOKEN: ${{ inputs.repo-token }}
 
