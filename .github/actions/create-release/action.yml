@@ -9,6 +9,10 @@ inputs:
     description: The GitHub token used to create release
     required: false
     default: ${{ github.token }}
+  version-file-path:
+    description: Optional version file path
+    default: "VERSION"
+    required: false
 
 outputs:
   version:
@@ -24,12 +28,12 @@ runs:
 
     - name: Get current version
       id: get_current_version
-      run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+      run: echo "version=$(cat ${{ inputs.version-file-path }})" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Get version to upgrade to
       id: upgrade-version-id
-      uses: data-engineering-helpers/common-ci-pipeline/.github/actions/upgrade-version@0.1.2
+      uses: data-engineering-helpers/common-ci-pipeline/.github/actions/upgrade-version@0.2.0
       with:
         version: ${{ steps.get_current_version.outputs.version }}
         upgrade-type: ${{ inputs.upgrade-type }}
