@@ -9,6 +9,10 @@ inputs:
     description: The GitHub token used to create release
     required: false
     default: ${{ github.token }}
+  version-file-path:
+    description: Optional version file path
+    default: "VERSION"
+    required: false
 
 outputs:
   version:
@@ -24,7 +28,7 @@ runs:
 
     - name: Get current version
       id: get_current_version
-      run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+      run: echo "version=$(cat ${{ inputs.version-file-path }})" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Get version to upgrade to
