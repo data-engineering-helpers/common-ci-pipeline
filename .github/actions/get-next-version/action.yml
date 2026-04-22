@@ -1,0 +1,43 @@
+name: Get next version
+description: Gets the next version
+
+inputs:
+  upgrade-type:
+    description: Choice of the type of upgrade of the next version.
+    default: ""
+    required: true
+  version-file-path:
+    description: Optional version file path
+    default: "VERSION"
+    required: false
+
+outputs:
+  version:
+    description: The next version.
+    value: ${{ steps.step-output-id.outputs.version }}
+
+runs:
+  using: composite
+
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Get current version
+      id: get_current_version
+      run: echo "version=$(cat ${{ inputs.version-file-path }})" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Get version to upgrade to
+      id: upgrade-version-id
+      uses: .github/actions/upgrade-version
+      with:
+        version: ${{ steps.get_current_version.outputs.version }}
+        upgrade-type: ${{ inputs.upgrade-type }}
+
+    - name: Outputs the new version
+      id: step-output-id
+      run: |
+        echo "Next version would be ${{ steps.upgrade-version-id.outputs.version }}"
+        echo "version=${{ steps.upgrade-version-id.outputs.version }}" >> $GITHUB_OUTPUT
+      shell: bash
