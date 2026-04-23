@@ -5,10 +5,10 @@
 - [common-ci-pipeline](#common-ci-pipeline)
   - [Table of contents](#table-of-contents)
   - [Description](#description)
-  - [Actions/Workflows descriptions](#actionsworkflows-descriptions)
-    - [Workflow: Create release branch](#workflow-create-release-branch)
-    - [Workflow: Finish release](#workflow-finish-release)
-    - [Workflow: Add Label Hotfix - Releases](#workflow-add-label-hotfix---releases)
+  - [Actions descriptions](#actions-descriptions)
+    - [Action: Create release branch](#action-create-release-branch)
+    - [Action: Finish release](#action-finish-release)
+    - [Action: Add Label Hotfix - Releases](#action-add-label-hotfix---releases)
 
 ## Description
 
@@ -57,10 +57,10 @@ jobs:
           repo-token: ${{ github.token }}
 ```
 
-## Actions/Workflows descriptions
+## Actions descriptions
 
-The workflows available in this project aims at reproducing the gitflow actions concerning releases.
-Each workflow is detailed below.
+The actions available in this project aims at reproducing the gitflow actions concerning releases.
+Each action is detailed below.
 
 More features and actions could be made available in the future.
 
