@@ -80,3 +80,11 @@ The action will try to create the tag with the version number associated with th
 ### Action: Add Label Hotfix - Releases
 
 This action is not to be run by the developer but will run automatically and proceed when a pull request which name starts with either "Hotfix" or "Release" is created. The action will proceed to add the matching label (eiher "hotfix" or "release" to the pull request).
+
+### Action: Get next version
+
+This action takes as inputs a version file path and an upgrade type (patch, minor, major) and then returns the next version of the one included in the version file.
+
+### Action: Bump version
+
+This action takes as inputs a version to bump to, a branch name and a Github repository token and then will update the package by calling a `make upgrade` action on the called repository to update the version and commits it before pushing it.

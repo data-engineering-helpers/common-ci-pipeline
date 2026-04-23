@@ -14,10 +14,6 @@ inputs:
     description: The GitHub token used to create release
     required: false
     default: ${{ github.token }}
-  version-file-path:
-    description: Optional version file path
-    default: "VERSION"
-    required: false
 
 runs:
   using: composite
