@@ -28,7 +28,7 @@ runs:
 
     - name: Get next version 
       id: get_next_version
-      uses: .github/actions/get-next-version
+      uses:  data-engineering-helpers/common-ci-pipeline/.github/actions/upgrade-version@main
       with:
         upgrade-type: ${{ inputs.upgrade-type }}
 
@@ -87,7 +87,7 @@ runs:
 
     - name: Bump to next version
       id: bump_to_next_version
-      uses: .github/actions/bump-version
+      uses:  data-engineering-helpers/common-ci-pipeline/.github/actions/upgrade-version@main
       with:
         version: ${{ steps.get_next_version.outputs.version }}
         branch-name: "release/${{ steps.get_next_version.outputs.version }}"
