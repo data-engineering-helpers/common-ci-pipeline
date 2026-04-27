@@ -5,10 +5,10 @@
 - [common-ci-pipeline](#common-ci-pipeline)
   - [Table of contents](#table-of-contents)
   - [Description](#description)
-  - [Actions/Workflows descriptions](#actionsworkflows-descriptions)
-    - [Workflow: Create release branch](#workflow-create-release-branch)
-    - [Workflow: Finish release](#workflow-finish-release)
-    - [Workflow: Add Label Hotfix - Releases](#workflow-add-label-hotfix---releases)
+  - [Actions descriptions](#actions-descriptions)
+    - [Action: Create release branch](#action-create-release-branch)
+    - [Action: Finish release](#action-finish-release)
+    - [Action: Add Label Hotfix - Releases](#action-add-label-hotfix---releases)
 
 ## Description
 
@@ -57,14 +57,14 @@ jobs:
           repo-token: ${{ github.token }}
 ```
 
-## Actions/Workflows descriptions
+## Actions descriptions
 
-The workflows available in this project aims at reproducing the gitflow actions concerning releases.
-Each workflow is detailed below.
+The actions available in this project aims at reproducing the gitflow actions concerning releases.
+Each action is detailed below.
 
 More features and actions could be made available in the future.
 
-### Workflow: Create release branch
+### Action: Create release branch
 
 This action will attempt to create a release branch from the latest commit of the develop branch and create the related Pull Request to the main branch with a automatic message. The branch can then be pulled and worked on.
 
@@ -72,11 +72,19 @@ This action will attempt to create a release branch from the latest commit of th
 
 This action takes the upgrade type to apply (`upgrade-type`) as input. The value must be one of : **major**, **minor**, **patch**.
 
-### Workflow: Finish release
+### Action: Finish release
 
 This action is not to be run by the developer but will run automatically and proceed when a pull request concerning a release is merged.
 The action will try to create the tag with the version number associated with the release Pull Request which was merged.
 
-### Workflow: Add Label Hotfix - Releases
+### Action: Add Label Hotfix - Releases
 
 This action is not to be run by the developer but will run automatically and proceed when a pull request which name starts with either "Hotfix" or "Release" is created. The action will proceed to add the matching label (eiher "hotfix" or "release" to the pull request).
+
+### Action: Get next version
+
+This action takes as inputs a version file path and an upgrade type (patch, minor, major) and then returns the next version of the one included in the version file.
+
+### Action: Bump version
+
+This action takes as inputs a version to bump to, a branch name and a Github repository token and then will update the package by calling a `make upgrade` action on the called repository to update the version and commits it before pushing it.
