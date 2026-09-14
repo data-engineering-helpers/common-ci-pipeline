@@ -28,7 +28,7 @@ runs:
 
     - name: Get next version 
       id: get_next_version
-      uses:  data-engineering-helpers/common-ci-pipeline/.github/actions/upgrade-version@main
+      uses:  data-engineering-helpers/common-ci-pipeline/.github/actions/get-next-version@main
       with:
         upgrade-type: ${{ inputs.upgrade-type }}
 
