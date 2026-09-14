@@ -87,7 +87,7 @@ runs:
 
     - name: Bump to next version
       id: bump_to_next_version
-      uses:  data-engineering-helpers/common-ci-pipeline/.github/actions/upgrade-version@main
+      uses:  data-engineering-helpers/common-ci-pipeline/.github/actions/bump-version@main
       with:
         version: ${{ steps.get_next_version.outputs.version }}
         branch-name: "release/${{ steps.get_next_version.outputs.version }}"
